@@ -1,0 +1,32 @@
+{
+  "name": "next-cognito-auth",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "yarn tsc --watch",
+    "build": "rimraf dist && yarn tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laptise/next-cognito-auth.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/laptise/next-cognito-auth/issues"
+  },
+  "homepage": "https://github.com/laptise/next-cognito-auth#readme",
+  "dependencies": {
+    "@types/react-dom": "^18.0.10",
+    "amazon-cognito-identity-js": "^6.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "rimraf": "^4.1.2",
+    "typescript": "^4.9.5"
+  }
+}
