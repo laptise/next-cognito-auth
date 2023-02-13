@@ -3,9 +3,11 @@ import {
   CognitoUserAttribute,
   CognitoUserPool,
   AuthenticationDetails,
+  CognitoUserSession,
+  CognitoRefreshToken,
 } from "amazon-cognito-identity-js";
-import { useContext } from "react";
-import { NextCognitoAuth } from "./context";
+import { useContext, useEffect } from "react";
+import { AuthType, NextCognitoAuth } from "./context";
 
 const useNextCognitoAuthProvider = () => {
   const { state } = useContext(NextCognitoAuth);
@@ -21,8 +23,68 @@ const useNextCognitoAuthProvider = () => {
 
 export const useCognitoAuth = () => {
   const { userPool, requiredFields } = useNextCognitoAuthProvider();
-  const { state } = useContext(NextCognitoAuth);
+  const { state, dispatch } = useContext(NextCognitoAuth);
   const { authStatus } = state;
+  /**Carefull is not correct status */
+  const isAuthenticated =
+    (authStatus.status === "CHECKING"
+      ? state.prevStatus
+      : authStatus.status) === "USER";
+
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+  const checkSession = async () => {
+    try {
+      dispatch({ type: "CHECKING" });
+      const user = userPool.getCurrentUser();
+      if (!user) throw "User not signed";
+      const session = await getSession(user);
+      const isValid = session.isValid();
+      if (!isValid) {
+        await referesh(user, session.getRefreshToken());
+      }
+      if (user) {
+        dispatch({ type: "SET_USER", user });
+      }
+    } catch {
+      dispatch({ type: "UNSET_USER" });
+    } finally {
+      dispatch({ type: "CHECKED" });
+    }
+  };
+
+  const referesh = async (
+    user: CognitoUser,
+    refreshToken: CognitoRefreshToken
+  ) => {
+    return await new Promise((resolve, reject) => {
+      user.refreshSession(refreshToken, (e, r) => {
+        if (e) {
+          console.error(e);
+          reject(e);
+        }
+        if (r) {
+          console.log(r);
+          resolve(r);
+        }
+      });
+    });
+  };
+
+  const getSession = async (user: CognitoUser) => {
+    return await new Promise<CognitoUserSession>((resolve, reject) => {
+      user?.getSession((e: Error | null, r: CognitoUserSession | null) => {
+        if (e) {
+          reject(e);
+        }
+        if (r) {
+          resolve(r);
+        }
+      });
+    });
+  };
 
   const customFieldsToAttributes = (customFields: {
     [key: string]: string;
@@ -75,5 +137,19 @@ export const useCognitoAuth = () => {
     });
   };
 
-  return { signUp, authStatus, signIn };
+  const signOut = async () => {
+    return await new Promise<void>((resolve, reject) => {
+      if (authStatus.status === "USER") {
+        const user = authStatus.user;
+        user.signOut(() => {
+          dispatch({ type: "UNSET_USER" });
+          resolve();
+        });
+      } else {
+        resolve();
+      }
+    });
+  };
+
+  return { signUp, authStatus, signIn, signOut, isAuthenticated };
 };

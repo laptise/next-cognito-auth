@@ -1,9 +1,9 @@
 import { CognitoUser } from "amazon-cognito-identity-js";
-import React, { createContext, FC, PropsWithChildren, useReducer } from "react";
+import { createContext, FC, PropsWithChildren, useReducer } from "react";
 import { Config } from "./configs";
 import { Action, reducer } from "./reducer";
 
-type AuthType =
+export type AuthType =
   | {
       status: "CHECKING";
     }
@@ -14,6 +14,7 @@ type AuthType =
 
 export type State<R extends { [key: string]: string }> = {
   authStatus: AuthType;
+  prevStatus: "STRANGER" | "USER";
   config: Config<R>;
 };
 
@@ -27,6 +28,7 @@ const generateConfig = <R extends { [key: string]: string }>(
 ): State<R> => {
   return {
     authStatus: { status: "CHECKING" },
+    prevStatus: "STRANGER",
     config,
   };
 };
