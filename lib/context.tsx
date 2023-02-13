@@ -12,27 +12,29 @@ type AuthType =
     }
   | { status: "USER"; user: CognitoUser };
 
-export type State = {
+export type State<R extends { [key: string]: string }> = {
   authStatus: AuthType;
-  config: Config;
+  config: Config<R>;
 };
 
-export type Context = {
-  state: State;
+export type Context<R extends { [key: string]: string }> = {
+  state: State<R>;
   dispatch: (action: Action) => void;
 };
 
-const generateConfig = (config: Config): State => {
+const generateConfig = <R extends { [key: string]: string }>(
+  config: Config<R>
+): State<R> => {
   return {
     authStatus: { status: "CHECKING" },
     config,
   };
 };
 
-export const NextCognitoAuth = createContext<Context>(null as any);
+export const NextCognitoAuth = createContext<Context<{}>>(null as any);
 
-type Props = { config: Config };
-export const NextCognitoAuthProvider: FC<PropsWithChildren<Props>> = ({
+type Props<R extends { [key: string]: string }> = { config: Config<R> };
+export const NextCognitoAuthProvider: FC<PropsWithChildren<Props<{}>>> = ({
   children,
   config,
 }) => {

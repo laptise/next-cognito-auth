@@ -15,6 +15,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "declaration": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
     "outDir": "./dist",
@@ -26,8 +27,8 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "lib/*.ts",
+    "lib/*.tsx"
   ],
   "exclude": [
     "node_modules"
