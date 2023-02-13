@@ -24,12 +24,7 @@ const useNextCognitoAuthProvider = () => {
 export const useCognitoAuth = () => {
   const { userPool, requiredFields } = useNextCognitoAuthProvider();
   const { state, dispatch } = useContext(NextCognitoAuth);
-  const { authStatus } = state;
-  /**Carefull is not correct status */
-  const isAuthenticated =
-    (authStatus.status === "CHECKING"
-      ? state.prevStatus
-      : authStatus.status) === "USER";
+  const { isAuthenticated, currentUser } = state;
 
   useEffect(() => {
     checkSession();
@@ -37,7 +32,6 @@ export const useCognitoAuth = () => {
 
   const checkSession = async () => {
     try {
-      dispatch({ type: "CHECKING" });
       const user = userPool.getCurrentUser();
       if (!user) throw "User not signed";
       const session = await getSession(user);
@@ -50,8 +44,6 @@ export const useCognitoAuth = () => {
       }
     } catch {
       dispatch({ type: "UNSET_USER" });
-    } finally {
-      dispatch({ type: "CHECKED" });
     }
   };
 
@@ -139,9 +131,8 @@ export const useCognitoAuth = () => {
 
   const signOut = async () => {
     return await new Promise<void>((resolve, reject) => {
-      if (authStatus.status === "USER") {
-        const user = authStatus.user;
-        user.signOut(() => {
+      if (isAuthenticated) {
+        currentUser.signOut(() => {
           dispatch({ type: "UNSET_USER" });
           resolve();
         });
@@ -151,5 +142,5 @@ export const useCognitoAuth = () => {
     });
   };
 
-  return { signUp, authStatus, signIn, signOut, isAuthenticated };
+  return { signUp, signIn, signOut, isAuthenticated };
 };

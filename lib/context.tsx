@@ -12,11 +12,17 @@ export type AuthType =
     }
   | { status: "USER"; user: CognitoUser };
 
-export type State<R extends { [key: string]: string }> = {
-  authStatus: AuthType;
-  prevStatus: "STRANGER" | "USER";
+type StateBody<R extends { [key: string]: string }> = {
   config: Config<R>;
 };
+export type State<R extends { [key: string]: string }> = StateBody<R> &
+  (
+    | {
+        isAuthenticated: true;
+        currentUser: CognitoUser;
+      }
+    | { isAuthenticated: false; currentUser: null }
+  );
 
 export type Context<R extends { [key: string]: string }> = {
   state: State<R>;
@@ -27,8 +33,8 @@ const generateConfig = <R extends { [key: string]: string }>(
   config: Config<R>
 ): State<R> => {
   return {
-    authStatus: { status: "CHECKING" },
-    prevStatus: "STRANGER",
+    isAuthenticated: false,
+    currentUser: null,
     config,
   };
 };
