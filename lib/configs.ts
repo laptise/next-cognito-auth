@@ -11,7 +11,7 @@ type AWSConfig<R extends BaseRequiredFields> = {
    * { nickname: true, address?: false }
    * ```
    */
-  requiredFields: R;
+  requiredFields?: R;
 };
 export type Config<R extends BaseRequiredFields> = {
   aws: AWSConfig<R>;

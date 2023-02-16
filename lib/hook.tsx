@@ -20,12 +20,11 @@ const useNextCognitoAuthProvider = () => {
   const { state } = useContext(NextCognitoAuth);
   const { config } = state;
   const { aws } = config;
-  const { requiredFields } = aws;
   const userPool = new CognitoUserPool({
     UserPoolId: aws.userPoolId,
     ClientId: aws.clientId,
   });
-  return { userPool, requiredFields };
+  return { userPool, requiredFields: aws.requiredFields || {} };
 };
 
 export const useCognitoAuth = <

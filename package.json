@@ -1,18 +1,21 @@
 {
   "name": "next-cognito-auth",
   "version": "0.1.0",
-  "description": "",
+  "description": "Simple cognito auth for Nextjs/React",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "yarn tsc --watch",
     "build": "rimraf dist && yarn tsc"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/laptise/next-cognito-auth.git"
   },
-  "author": "",
+  "author": "laptise@live.jp",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/laptise/next-cognito-auth/issues"

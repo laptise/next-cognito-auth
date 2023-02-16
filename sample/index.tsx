@@ -4,7 +4,7 @@ import {
   NextCognitoAuthProvider,
   useCognitoAuth,
 } from "../dist";
-const dada = () => {
+const SampleApp = () => {
   return (
     <NextCognitoAuthProvider
       config={
@@ -19,7 +19,10 @@ const dada = () => {
     ></NextCognitoAuthProvider>
   );
 };
-const Hel = () => {
-  const { signUp } = useCognitoAuth<{ hello: true; jees?: true }>();
-  signUp("la", "asda", { hello: "asd" });
+
+const Sample = () => {
+  const { signUp, signIn, codeConfirmation, isAuthenticated } = useCognitoAuth<{
+    nickname: true;
+    address?: false;
+  }>();
 };
