@@ -4,6 +4,9 @@ export type UseCognitoAuth<R extends BaseRequiredFields> = {
   signUp: CognitoAuthSignUp<R>;
   signIn: CognitoAuthSignIn;
   signOut: () => Promise<void>;
+  codeConfirmation: CongitoAuthCodeConfirmation;
+  forgotPassword: CognitoAuthForgotPssword;
+  changePassword: CognitoAuthChangePassword;
   isAuthenticated: boolean;
 };
 
@@ -24,10 +27,23 @@ export type CognitoAuthSignIn = (
   password: string
 ) => Promise<SignInResult>;
 
+export type CongitoAuthCodeConfirmation = (
+  username: string,
+  code: string
+) => Promise<"SUCCESS">;
+
 export type SignInResult = {
   session: CognitoUserSession;
   userConfirmationNecessary?: boolean;
 };
+
+export type CognitoAuthChangePassword = (
+  usename: string,
+  oldPassword: string,
+  newPassword: string
+) => Promise<"SUCCESS">;
+
+export type CognitoAuthForgotPssword = (username: string) => Promise<any>;
 
 export type BaseRequiredFields = {
   [key: string]: boolean;

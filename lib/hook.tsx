@@ -102,7 +102,7 @@ export const useCognitoAuth = <
     password: string,
     customFields: { [key in KeyOf<R>]: string }
   ) => {
-    const requiredKeys = Object.entries(state.config.aws.requiredFields || {})
+    const requiredKeys = Object.entries(requiredFields || {})
       .filter(([key, val]) => val)
       .map((x) => x[0]);
     const unfilledField = requiredKeys.find(
@@ -161,5 +161,71 @@ export const useCognitoAuth = <
     });
   };
 
-  return { signUp, signIn, signOut, isAuthenticated };
+  const codeConfirmation = async (username: string, code: string) => {
+    return await new Promise<"SUCCESS">((resolve, reject) => {
+      if (userPool) {
+        const user = new CognitoUser({ Pool: userPool, Username: username });
+        user.confirmRegistration(code, true, (e, r) => {
+          if (e) {
+            reject(e);
+          }
+          if (r) {
+            resolve("SUCCESS");
+          }
+        });
+      } else {
+        reject();
+      }
+    });
+  };
+
+  const forgotPassword = async (username: string) => {
+    return await new Promise<any>((resolve, reject) => {
+      if (userPool) {
+        const user = new CognitoUser({ Pool: userPool, Username: username });
+        user.forgotPassword({
+          onSuccess(data) {
+            resolve(data);
+          },
+          onFailure(err) {
+            reject(err);
+          },
+        });
+      } else {
+        reject();
+      }
+    });
+  };
+
+  const changePassword = async (
+    username: string,
+    oldPassword: string,
+    newPassword: string
+  ) => {
+    return await new Promise<"SUCCESS">((resolve, reject) => {
+      if (userPool) {
+        const user = new CognitoUser({ Pool: userPool, Username: username });
+        user.changePassword(oldPassword, newPassword, (e, r) => {
+          if (e) {
+            reject();
+          }
+          if (r) {
+            resolve("SUCCESS");
+          }
+        });
+      } else {
+        reject();
+      }
+    });
+  };
+
+  return {
+    signUp,
+    signIn,
+    signOut,
+    isAuthenticated,
+    codeConfirmation,
+    forgotPassword,
+    changePassword,
+  };
 };
