@@ -2,6 +2,7 @@ import { CognitoUser } from "amazon-cognito-identity-js";
 import { createContext, FC, PropsWithChildren, useReducer } from "react";
 import { Config } from "./configs";
 import { Action, reducer } from "./reducer";
+import { BaseRequiredFields } from "./type";
 
 export type AuthType =
   | {
@@ -12,10 +13,10 @@ export type AuthType =
     }
   | { status: "USER"; user: CognitoUser };
 
-type StateBody<R extends { [key: string]: string }> = {
+type StateBody<R extends BaseRequiredFields> = {
   config: Config<R>;
 };
-export type State<R extends { [key: string]: string }> = StateBody<R> &
+export type State<R extends BaseRequiredFields> = StateBody<R> &
   (
     | {
         isAuthenticated: true;
@@ -24,12 +25,12 @@ export type State<R extends { [key: string]: string }> = StateBody<R> &
     | { isAuthenticated: false; currentUser: null }
   );
 
-export type Context<R extends { [key: string]: string }> = {
+export type Context<R extends BaseRequiredFields> = {
   state: State<R>;
   dispatch: (action: Action) => void;
 };
 
-const generateConfig = <R extends { [key: string]: string }>(
+const generateConfig = <R extends BaseRequiredFields>(
   config: Config<R>
 ): State<R> => {
   return {
@@ -41,7 +42,10 @@ const generateConfig = <R extends { [key: string]: string }>(
 
 export const NextCognitoAuth = createContext<Context<{}>>(null as any);
 
-type Props<R extends { [key: string]: string }> = { config: Config<R> };
+type Props<R extends BaseRequiredFields> = {
+  /**Provide options here. */
+  config: Config<R>;
+};
 export const NextCognitoAuthProvider: FC<PropsWithChildren<Props<{}>>> = ({
   children,
   config,

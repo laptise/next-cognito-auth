@@ -1,5 +1,9 @@
 import React from "react";
-import { NextCognitoAuthConfig, NextCognitoAuthProvider } from "../dist";
+import {
+  NextCognitoAuthConfig,
+  NextCognitoAuthProvider,
+  useCognitoAuth,
+} from "../dist";
 const dada = () => {
   return (
     <NextCognitoAuthProvider
@@ -8,10 +12,14 @@ const dada = () => {
           aws: {
             userPoolId: "asda",
             clientId: "asdas",
-            requiredFields: { nickName: "nickName" },
+            requiredFields: { nickName: true },
           },
         })
       }
     ></NextCognitoAuthProvider>
   );
+};
+const Hel = () => {
+  const { signUp } = useCognitoAuth<{ hello: true; jees?: true }>();
+  signUp("la", "asda", { hello: "asd" });
 };

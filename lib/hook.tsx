@@ -1,13 +1,20 @@
 import {
+  AuthenticationDetails,
+  CognitoRefreshToken,
   CognitoUser,
   CognitoUserAttribute,
   CognitoUserPool,
-  AuthenticationDetails,
   CognitoUserSession,
-  CognitoRefreshToken,
+  ISignUpResult,
 } from "amazon-cognito-identity-js";
 import { useContext, useEffect } from "react";
-import { AuthType, NextCognitoAuth } from "./context";
+import { NextCognitoAuth } from "./context";
+import {
+  BaseRequiredFields,
+  KeyOf,
+  SignInResult,
+  UseCognitoAuth,
+} from "./type";
 
 const useNextCognitoAuthProvider = () => {
   const { state } = useContext(NextCognitoAuth);
@@ -21,7 +28,9 @@ const useNextCognitoAuthProvider = () => {
   return { userPool, requiredFields };
 };
 
-export const useCognitoAuth = () => {
+export const useCognitoAuth = <
+  R extends BaseRequiredFields
+>(): UseCognitoAuth<R> => {
   const { userPool, requiredFields } = useNextCognitoAuthProvider();
   const { state, dispatch } = useContext(NextCognitoAuth);
   const { isAuthenticated, currentUser } = state;
@@ -79,7 +88,7 @@ export const useCognitoAuth = () => {
   };
 
   const customFieldsToAttributes = (customFields: {
-    [key: string]: string;
+    [key in KeyOf<R>]: string;
   }) => {
     const attributes: CognitoUserAttribute[] = [];
     for (const [key, value] of Object.entries(customFields)) {
@@ -91,9 +100,19 @@ export const useCognitoAuth = () => {
   const signUp = async (
     username: string,
     password: string,
-    customFields: typeof requiredFields
+    customFields: { [key in KeyOf<R>]: string }
   ) => {
-    return await new Promise((resolver, rejector) => {
+    const requiredKeys = Object.entries(state.config.aws.requiredFields || {})
+      .filter(([key, val]) => val)
+      .map((x) => x[0]);
+    const unfilledField = requiredKeys.find(
+      (keyName) =>
+        customFields[keyName] === null || customFields[keyName] === undefined
+    );
+    if (unfilledField === undefined) {
+      throw `Required fields not fulfilled: ${unfilledField}`;
+    }
+    return await new Promise<ISignUpResult>((resolver, rejector) => {
       userPool?.signUp(
         username,
         password,
@@ -112,7 +131,7 @@ export const useCognitoAuth = () => {
   };
 
   const signIn = async (username: string, password: string) => {
-    return await new Promise((resolover, rejector) => {
+    return await new Promise<SignInResult>((resolover, rejector) => {
       const auth = new AuthenticationDetails({
         Username: username,
         Password: password,
