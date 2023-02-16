@@ -1,3 +1,6 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NextCognitoAuthConfig = void 0;
 var NextCognitoAuthConfig = /** @class */ (function () {
     function NextCognitoAuthConfig(_a) {
         var aws = _a.aws;
@@ -5,4 +8,4 @@ var NextCognitoAuthConfig = /** @class */ (function () {
     }
     return NextCognitoAuthConfig;
 }());
-export { NextCognitoAuthConfig };
+exports.NextCognitoAuthConfig = NextCognitoAuthConfig;
