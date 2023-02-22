@@ -14,7 +14,7 @@ export const reducer = (state: State<{}>, action: Action): State<{}> => {
   switch (action.type) {
     case "SET_USER":
       state = { ...state, isAuthenticated: true, currentUser: action.user };
-      return state;
+      return { ...state };
     case "UNSET_USER":
       state = { ...state, isAuthenticated: false, currentUser: null };
       return { ...state };

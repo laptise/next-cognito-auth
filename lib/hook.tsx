@@ -24,6 +24,7 @@ const useNextCognitoAuthProvider = () => {
     UserPoolId: aws.userPoolId,
     ClientId: aws.clientId,
   });
+
   return { userPool, requiredFields: aws.requiredFields || {} };
 };
 
@@ -33,31 +34,22 @@ export const useCognitoAuth = <
   const { userPool, requiredFields } = useNextCognitoAuthProvider();
   const { state, dispatch } = useContext(NextCognitoAuth);
   const { isAuthenticated, currentUser } = state;
-  const [user, setUser] = useState<CognitoUser | null>(null);
 
   useEffect(() => {
     checkSession();
   }, []);
 
-  useEffect(() => {
-    if (userPool && isAuthenticated) {
-      setUser(userPool.getCurrentUser());
-    } else {
-      setUser(null);
-    }
-  }, [isAuthenticated]);
-
   const checkSession = async () => {
     try {
-      const user = userPool.getCurrentUser();
-      if (!user) throw "User not signed";
-      const session = await getSession(user);
+      const newUser = userPool.getCurrentUser();
+      if (!newUser) throw "User not signed";
+      const session = await getSession(newUser);
       const isValid = session.isValid();
       if (!isValid) {
-        await referesh(user, session.getRefreshToken());
+        await referesh(newUser, session.getRefreshToken());
       }
-      if (user) {
-        dispatch({ type: "SET_USER", user });
+      if (newUser?.getUsername() !== currentUser?.getUsername()) {
+        dispatch({ type: "SET_USER", user: newUser });
       }
     } catch {
       dispatch({ type: "UNSET_USER" });
@@ -233,6 +225,6 @@ export const useCognitoAuth = <
     codeConfirmation,
     forgotPassword,
     changePassword,
-    user,
+    user: currentUser,
   };
 };
