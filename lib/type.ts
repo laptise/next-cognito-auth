@@ -1,4 +1,8 @@
-import { ISignUpResult, CognitoUserSession } from "amazon-cognito-identity-js";
+import {
+  ISignUpResult,
+  CognitoUserSession,
+  CognitoUser,
+} from "amazon-cognito-identity-js";
 
 export type UseCognitoAuth<R extends BaseRequiredFields> = {
   signUp: CognitoAuthSignUp<R>;
@@ -8,6 +12,7 @@ export type UseCognitoAuth<R extends BaseRequiredFields> = {
   forgotPassword: CognitoAuthForgotPssword;
   changePassword: CognitoAuthChangePassword;
   isAuthenticated: boolean;
+  user: CognitoUser | null;
 };
 
 export type KeyOf<R> = keyof R;

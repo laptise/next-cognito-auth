@@ -7,7 +7,7 @@ import {
   CognitoUserSession,
   ISignUpResult,
 } from "amazon-cognito-identity-js";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NextCognitoAuth } from "./context";
 import {
   BaseRequiredFields,
@@ -33,10 +33,20 @@ export const useCognitoAuth = <
   const { userPool, requiredFields } = useNextCognitoAuthProvider();
   const { state, dispatch } = useContext(NextCognitoAuth);
   const { isAuthenticated, currentUser } = state;
+  const [user, setUser] = useState<CognitoUser | null>(null);
 
   useEffect(() => {
     checkSession();
   }, []);
+
+  useEffect(() => {
+    if (userPool && isAuthenticated) {
+      setUser(userPool.getCurrentUser());
+      console.log(user?.getSignInUserSession());
+    } else {
+      setUser(null);
+    }
+  }, [isAuthenticated]);
 
   const checkSession = async () => {
     try {
@@ -62,11 +72,9 @@ export const useCognitoAuth = <
     return await new Promise((resolve, reject) => {
       user.refreshSession(refreshToken, (e, r) => {
         if (e) {
-          console.error(e);
           reject(e);
         }
         if (r) {
-          console.log(r);
           resolve(r);
         }
       });
@@ -226,5 +234,6 @@ export const useCognitoAuth = <
     codeConfirmation,
     forgotPassword,
     changePassword,
+    user,
   };
 };
