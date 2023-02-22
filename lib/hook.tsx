@@ -42,7 +42,6 @@ export const useCognitoAuth = <
   useEffect(() => {
     if (userPool && isAuthenticated) {
       setUser(userPool.getCurrentUser());
-      console.log(user?.getSignInUserSession());
     } else {
       setUser(null);
     }
