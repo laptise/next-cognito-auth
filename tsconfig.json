@@ -29,7 +29,8 @@
   "include": [
     "next-env.d.ts",
     "lib/*.ts",
-    "lib/*.tsx"
+    "lib/*.tsx",
+    "lib/global.d.ts"
   ],
   "exclude": [
     "node_modules"

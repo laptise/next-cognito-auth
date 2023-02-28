@@ -16,6 +16,7 @@ export type AuthType =
 type StateBody<R extends BaseRequiredFields> = {
   config: Config<R>;
 };
+
 export type State<R extends BaseRequiredFields> = StateBody<R> &
   (
     | {

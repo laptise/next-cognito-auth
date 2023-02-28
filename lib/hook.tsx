@@ -5,9 +5,10 @@ import {
   CognitoUserAttribute,
   CognitoUserPool,
   CognitoUserSession,
+  CookieStorage,
   ISignUpResult,
 } from "amazon-cognito-identity-js";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { NextCognitoAuth } from "./context";
 import {
   BaseRequiredFields,
@@ -19,19 +20,22 @@ import {
 const useNextCognitoAuthProvider = () => {
   const { state } = useContext(NextCognitoAuth);
   const { config } = state;
-  const { aws } = config;
+  const { aws, cookie } = config;
+  const cookiStorage = new CookieStorage(cookie);
   const userPool = new CognitoUserPool({
     UserPoolId: aws.userPoolId,
     ClientId: aws.clientId,
+    Storage: cookiStorage,
   });
 
-  return { userPool, requiredFields: aws.requiredFields || {} };
+  return { userPool, cookiStorage, requiredFields: aws.requiredFields || {} };
 };
 
 export const useCognitoAuth = <
   R extends BaseRequiredFields
 >(): UseCognitoAuth<R> => {
-  const { userPool, requiredFields } = useNextCognitoAuthProvider();
+  const { userPool, requiredFields, cookiStorage } =
+    useNextCognitoAuthProvider();
   const { state, dispatch } = useContext(NextCognitoAuth);
   const { isAuthenticated, currentUser } = state;
 
@@ -134,7 +138,11 @@ export const useCognitoAuth = <
         Username: username,
         Password: password,
       });
-      const user = new CognitoUser({ Username: username, Pool: userPool });
+      const user = new CognitoUser({
+        Username: username,
+        Pool: userPool,
+        Storage: cookiStorage,
+      });
       user.authenticateUser(auth, {
         onSuccess(session, userConfirmationNecessary) {
           resolover({ session, userConfirmationNecessary });
@@ -162,7 +170,11 @@ export const useCognitoAuth = <
   const codeConfirmation = async (username: string, code: string) => {
     return await new Promise<"SUCCESS">((resolve, reject) => {
       if (userPool) {
-        const user = new CognitoUser({ Pool: userPool, Username: username });
+        const user = new CognitoUser({
+          Pool: userPool,
+          Username: username,
+          Storage: cookiStorage,
+        });
         user.confirmRegistration(code, true, (e, r) => {
           if (e) {
             reject(e);
@@ -180,7 +192,11 @@ export const useCognitoAuth = <
   const forgotPassword = async (username: string) => {
     return await new Promise<any>((resolve, reject) => {
       if (userPool) {
-        const user = new CognitoUser({ Pool: userPool, Username: username });
+        const user = new CognitoUser({
+          Pool: userPool,
+          Username: username,
+          Storage: cookiStorage,
+        });
         user.forgotPassword({
           onSuccess(data) {
             resolve(data);
@@ -202,7 +218,11 @@ export const useCognitoAuth = <
   ) => {
     return await new Promise<"SUCCESS">((resolve, reject) => {
       if (userPool) {
-        const user = new CognitoUser({ Pool: userPool, Username: username });
+        const user = new CognitoUser({
+          Pool: userPool,
+          Username: username,
+          Storage: cookiStorage,
+        });
         user.changePassword(oldPassword, newPassword, (e, r) => {
           if (e) {
             reject();

@@ -24,12 +24,15 @@ usage
 In `_app.tsx`
 
 ```tsx
-import { NextCognitoAuthProvider } from "next-cognito-auth";
+import { NextCognitoAuthProvider, initServerSideAuth } from "next-cognito-auth";
 const App = () => {
+  const NCAConfig = {
+    aws: { userPoolId: "USER_POOL_ID", clientId: "CLIENT_ID" },
+    cookie: { domain: "your_domain" },
+  };
+  initServerSideAuth(NCAConfig);
   return (
-    <NextCognitoAuthProvider
-      config={{ aws: { userPoolId: "USER_POOL_ID", clientId: "CLIENT_ID" } }}
-    >
+    <NextCognitoAuthProvider config={NCAConfig}>
       <Component {...pageProps} />
     </NextCognitoAuthProvider>
   );
@@ -95,5 +98,36 @@ const WhoAmI = () => {
   ) : (
     <span>Hello stranger!</span>
   );
+};
+```
+
+## Work with SSR
+
+### Get auth user
+
+Simillar with getServerSideProps of Next.js
+
+```tsx
+import { withServerSideAuth } from "next-cognito-auth";
+export const getServerSideProps = withServerSideAuth<{ auth: any }>(
+  // Your auth user will be passed here. (nullable)
+  ({ req, auth }) => {
+    // So you can control auth behaviours ..
+    if (!auth) {
+      return { notFound: true };
+    }
+    return { props: { auth } };
+  }
+);
+```
+
+### Get auth user manually in SSR scope
+
+```tsx
+import { GetServerSideProps } from "next";
+import { getServerSideAuth } from "next-cognito-auth";
+export const getServerSideProps: GetServerSideProps = (ctx) => {
+  const auth = getServerSideAuth(ctx);
+  // do something..
 };
 ```

@@ -3,6 +3,7 @@ import {
   NextCognitoAuthConfig,
   NextCognitoAuthProvider,
   useCognitoAuth,
+  withServerSideAuth,
 } from "../dist";
 const SampleApp = () => {
   return (
@@ -14,6 +15,7 @@ const SampleApp = () => {
             clientId: "asdas",
             requiredFields: { nickName: true },
           },
+          cookie: { domain: "localhost" },
         })
       }
     ></NextCognitoAuthProvider>
@@ -26,3 +28,7 @@ const Sample = () => {
     address?: false;
   }>();
 };
+
+export const getServerSideProps = withServerSideAuth(async ({ auth }) => {
+  return { props: {} };
+});

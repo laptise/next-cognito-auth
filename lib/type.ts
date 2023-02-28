@@ -53,3 +53,7 @@ export type CognitoAuthForgotPssword = (username: string) => Promise<any>;
 export type BaseRequiredFields = {
   [key: string]: boolean;
 };
+
+declare interface globalThis {
+  test: string;
+}
