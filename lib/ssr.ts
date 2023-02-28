@@ -24,7 +24,7 @@ type AuthInjected<T> = T & {
 type MayBePromise<T> = T | Promise<T>;
 
 const getConfig = () => {
-  const config = globalThis.NextCognitoAuthConfig;
+  const config = process.env.NextCognitoAuthClientId;
   if (!config)
     throw "Cognito config is not found! You must call initServerSideAuth.";
   else return config;
@@ -55,7 +55,7 @@ export const getServerSideAuth = (context: {
   req: { cookies: NextApiRequestCookies };
 }) => {
   const cookie = parseCookies(context);
-  const { clientId } = getConfig();
+  const clientId = getConfig();
   const lastUser =
     cookie[`CognitoIdentityServiceProvider.${clientId}.LastAuthUser`];
   const idToken =
@@ -92,6 +92,6 @@ export const getServerSideAuth = (context: {
 };
 
 export const initServerSideAuth = ({ aws }: Config<BaseRequiredFields>) => {
-  const { userPoolId, clientId } = aws;
-  globalThis.NextCognitoAuthConfig = { userPoolId, clientId };
+  const { clientId } = aws;
+  process.env.NextCognitoAuthClientId = clientId;
 };
