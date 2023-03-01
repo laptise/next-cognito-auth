@@ -2,6 +2,7 @@ import {
   ISignUpResult,
   CognitoUserSession,
   CognitoUser,
+  CognitoUserPool,
 } from "amazon-cognito-identity-js";
 
 export type UseCognitoAuth<R extends BaseRequiredFields> = {
@@ -13,6 +14,7 @@ export type UseCognitoAuth<R extends BaseRequiredFields> = {
   changePassword: CognitoAuthChangePassword;
   isAuthenticated: boolean;
   user: CognitoUser | null;
+  userPool: CognitoUserPool;
 };
 
 export type KeyOf<R> = keyof R;
@@ -53,7 +55,3 @@ export type CognitoAuthForgotPssword = (username: string) => Promise<any>;
 export type BaseRequiredFields = {
   [key: string]: boolean;
 };
-
-declare interface globalThis {
-  test: string;
-}

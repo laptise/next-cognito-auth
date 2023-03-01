@@ -246,5 +246,6 @@ export const useCognitoAuth = <
     forgotPassword,
     changePassword,
     user: currentUser,
+    userPool,
   };
 };
