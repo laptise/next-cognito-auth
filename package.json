@@ -9,6 +9,14 @@
     "prepublishOnly": "yarn build",
     "build": "rimraf dist && yarn tsc"
   },
+  "keywords": [
+    "next",
+    "nextjs",
+    "cognito",
+    "auth",
+    "hooks",
+    "typescript"
+  ],
   "files": [
     "dist"
   ],
