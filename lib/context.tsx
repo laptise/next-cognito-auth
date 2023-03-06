@@ -4,15 +4,6 @@ import { Config } from "./configs";
 import { Action, reducer } from "./reducer";
 import { BaseRequiredFields } from "./type";
 
-export type AuthType =
-  | {
-      status: "CHECKING";
-    }
-  | {
-      status: "STRANGER";
-    }
-  | { status: "USER"; user: CognitoUser };
-
 type StateBody<R extends BaseRequiredFields> = {
   config: Config<R>;
 };

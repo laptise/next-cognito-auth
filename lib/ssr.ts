@@ -3,6 +3,7 @@ import {
   CognitoIdToken,
   CognitoRefreshToken,
   CognitoUserSession,
+  ICognitoUserSessionData,
 } from "amazon-cognito-identity-js";
 import {
   GetServerSideProps,
@@ -19,6 +20,7 @@ import { BaseRequiredFields } from "./type";
 type AuthInjected<T> = T & {
   /**Logged in user */
   auth?: any;
+  session?: { idToken: string; accessToken: string; refreshToken: string };
 };
 
 type MayBePromise<T> = T | Promise<T>;
@@ -46,8 +48,11 @@ export const withServerSideAuth = <
   >;
 
   return (context: GetServerSidePropsContext<Params, Preview>) => {
-    const auth = getServerSideAuth(context);
-    return serverSidePropsWithAuth.call(this, Object.assign(context, { auth }));
+    const { auth, session } = getServerSideAuth(context);
+    return serverSidePropsWithAuth.call(
+      this,
+      Object.assign(context, { auth, session })
+    );
   };
 };
 
@@ -68,6 +73,7 @@ export const getServerSideAuth = (context: {
     cookie[
       `CognitoIdentityServiceProvider.${clientId}.${lastUser}.refreshToken`
     ];
+
   const session = new CognitoUserSession({
     RefreshToken: new CognitoRefreshToken({ RefreshToken: refreshToken }),
     IdToken: new CognitoIdToken({ IdToken: idToken }),
@@ -87,7 +93,9 @@ export const getServerSideAuth = (context: {
       jti,
       ...info
     } = session.getIdToken().payload;
-    return info;
+    return { auth: info, session: { idToken, refreshToken, accessToken } };
+  } else {
+    return { auth: null, session: null };
   }
 };
 

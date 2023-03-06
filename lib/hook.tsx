@@ -17,8 +17,14 @@ import {
   UseCognitoAuth,
 } from "./type";
 
-const useNextCognitoAuthProvider = () => {
-  const { state } = useContext(NextCognitoAuth);
+type InjectedAuth = {
+  idToken: string;
+  accessToken: string;
+  refreshToken: string;
+};
+
+const useNextCognitoAuthProvider = (auth?: InjectedAuth) => {
+  const { state, dispatch } = useContext(NextCognitoAuth);
   const { config } = state;
   const { aws, cookie } = config;
   const cookiStorage = new CookieStorage(cookie);
